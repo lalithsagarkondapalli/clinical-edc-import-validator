@@ -1,0 +1,21 @@
+dataset,record_no,subject,key,item,rule_id,severity,value,message
+DM,7,S02-003,S02-003,I.DM.SEX,V-CODE,error,X,"not in codelist ['F', 'M', 'U']"
+DM,9,S03-002,S03-002,I.DM.BRTHDTC,V-REQ,error,,BIRTH_DATE is required
+DM,10,S01-002,S01-002,SUBJID,V-DUP,error,S01-002,duplicate key; first seen at record 2
+DM,11,S03-003,S03-003,SITE,V-SITE,error,S02,site S02 does not match subject prefix S03
+VS,4,S01-002,S01-002|Week 4,I.VS.SYSBP,V-RANGE,error,300,"outside [60, 250]"
+VS,6,S01-003,S01-003|Screening,"SUBJID,VISIT",V-DUP,error,S01-003|Screening,duplicate key; first seen at record 5
+VS,7,S01-004,S01-004|Screening,"DIABP,SYSBP",VS-CF-01,error,130 / 122,cross-field rule failed: DIABP < SYSBP
+VS,8,S02-001,S02-001|Screening,I.VS.PULSE,V-TYPE,error,abc,not an integer
+VS,10,S02-002,S02-002|Screening,I.VS.VSDTC,V-DATE,error,2026-13-40,unparseable or invalid date
+VS,11,S02-002,S02-002|Wk 12,VISIT,V-VISIT,error,Wk 12,visit label not in spec visit map
+VS,12,S02-003,S02-003|Screening,SUBJID,V-SUBJ-REF,error,S02-003,subject not registered in accepted DM
+VS,13,S03-001,S03-001|Screening,I.VS.WEIGHT,V-UNIT,error,stone,"unit not in ['kg', 'lb']"
+VS,14,S03-001,S03-001|Week 4,I.VS.VSDTC,V-FUTURE,error,2099-01-01,date is after the run date
+VS,15,S09-001,S09-001|Screening,SUBJID,V-SUBJ-PATTERN,error,S09-001,subject id does not match ^S0[1-3]-\d{3}$
+VS,16,S03-002,S03-002|Screening,SUBJID,V-SUBJ-REF,error,S03-002,subject not registered in accepted DM
+VS,16,S03-002,S03-002|Screening,I.VS.SYSBP,V-REQ,error,,SYSBP is required
+LB,3,S01-003,S01-003|WK4,I.LB.GLUC,V-RANGE,error,750,"outside [20, 600]"
+LB,5,S02-002,S02-002|Screening,I.LB.CREAT,V-TYPE,error,"0,9",not a decimal number
+AE,3,S02-001,S02-001|3,"AEENDTC,AESTDTC",AE-CF-01,error,2026-03-18 / 2026-03-20,cross-field rule failed: AEENDTC >= AESTDTC
+AE,5,S03-001,S03-001|5,I.AE.AESEV,V-CODE,error,Grade 2,"not in codelist ['MILD', 'MODERATE', 'SEVERE']"
