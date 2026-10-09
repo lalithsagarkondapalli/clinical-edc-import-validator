@@ -1,0 +1,108 @@
+# Data Transfer Specification -- CARD-301 (synthetic study)
+# ----------------------------------------------------------------------------
+# This file is the single source of truth for how source files are mapped into
+# the EDC. Any change goes through change control: bump spec_version, add a
+# CHANGELOG entry, and re-run the regression suite (pytest) before release.
+# ----------------------------------------------------------------------------
+study:
+  oid: ST.CARD301
+  name: CARD-301
+  description: Phase II hypertension study (SYNTHETIC DATA - no real patients)
+  metadata_version_oid: MDV.CARD301.1.0
+  spec_version: "1.0"
+  source_system: edcimport
+
+subject_id_pattern: '^S0[1-3]-\d{3}$'
+sites: [S01, S02, S03]
+
+# Visit labels used by sites / vendors -> ODM StudyEventOID
+visits:
+  Screening: SE.SCR
+  Week 4: SE.WK4
+  WK4: SE.WK4
+  Week 8: SE.WK8
+  WK8: SE.WK8
+
+datasets:
+  DM:
+    description: Demographics, site upload (Excel)
+    source: {format: xlsx, path: data/source/CARD301_DM_site_upload.xlsx, sheet: DM}
+    form_oid: F.DM
+    item_group_oid: IG.DM
+    fixed_event: SE.SCR
+    key: [SUBJID]
+    items:
+      - {oid: I.DM.SUBJID, source: SUBJID, type: text, required: true}
+      - {oid: I.DM.SITEID, source: SITE, type: text, required: true}
+      - {oid: I.DM.BRTHDTC, source: BIRTH_DATE, type: date, required: true}
+      - {oid: I.DM.SEX, source: SEX, type: code, required: true,
+         codelist: {M: M, Male: M, F: F, Female: F, U: U}}
+      - {oid: I.DM.RACE, source: RACE, type: text, required: false}
+
+  VS:
+    description: Vital signs, site upload (CSV)
+    source: {format: csv, path: data/source/CARD301_VS_site_upload.csv}
+    form_oid: F.VS
+    item_group_oid: IG.VS
+    event_source: VISIT
+    key: [SUBJID, VISIT]
+    items:
+      - {oid: I.VS.VSDTC, source: VS_DATE, type: date, required: true}
+      - {oid: I.VS.SYSBP, source: SYSBP, type: integer, required: true, range: [60, 250]}
+      - {oid: I.VS.DIABP, source: DIABP, type: integer, required: true, range: [30, 150]}
+      - {oid: I.VS.PULSE, source: PULSE, type: integer, required: false, range: [30, 200]}
+      - {oid: I.VS.WEIGHT, source: WEIGHT, type: float, required: false, range: [30, 250],
+         unit_source: WEIGHT_UNIT, target_unit: kg, conversions: {lb: 0.45359237, kg: 1.0}}
+    cross_field_rules:
+      - {id: VS-CF-01, rule: "DIABP < SYSBP", severity: error}
+
+  LB:
+    description: Central lab transfer (vendor JSON)
+    source: {format: json, path: data/source/CARD301_LB_centrallab.json, records_path: results}
+    form_oid: F.LB
+    item_group_oid: IG.LB
+    event_source: visit
+    subject_source: subject_id
+    key: [subject_id, visit]
+    items:
+      - {oid: I.LB.LBDTC, source: collected, type: datetime, required: true}
+      - {oid: I.LB.GLUC, source: glucose_mg_dl, type: float, required: false, range: [20, 600]}
+      - {oid: I.LB.CREAT, source: creatinine_mg_dl, type: float, required: false, range: [0.1, 15]}
+    expected_header:
+      vendor: SYNTH-LAB
+      study: CARD-301
+
+  AE:
+    description: Safety vendor transfer (namespaced XML)
+    source:
+      format: xml
+      path: data/source/CARD301_AE_safetyvendor.xml
+      schema: schemas/safety_vendor_v2.xsd
+      namespaces: {sv: "urn:example:safety-vendor:v2"}
+      record_xpath: //sv:AdverseEvent
+      fields:
+        SUBJID: sv:Subject/@id
+        AESEQ: "@seq"
+        AETERM: sv:Term
+        AESTDTC: sv:Onset
+        AEENDTC: sv:Resolution
+        AESEV: sv:Severity
+        AESER: sv:Serious
+    form_oid: F.AE
+    item_group_oid: IG.AE
+    fixed_event: SE.AE
+    repeat_key_source: AESEQ
+    key: [SUBJID, AESEQ]
+    items:
+      - {oid: I.AE.AETERM, source: AETERM, type: text, required: true, max_length: 200}
+      - {oid: I.AE.AESTDTC, source: AESTDTC, type: date, required: true}
+      - {oid: I.AE.AEENDTC, source: AEENDTC, type: date, required: false}
+      - {oid: I.AE.AESEV, source: AESEV, type: code, required: true,
+         codelist: {MILD: MILD, MODERATE: MODERATE, SEVERE: SEVERE, Mild: MILD, Moderate: MODERATE, Severe: SEVERE}}
+      - {oid: I.AE.AESER, source: AESER, type: code, required: true,
+         codelist: {Y: Y, N: N, "true": Y, "false": N}}
+    cross_field_rules:
+      - {id: AE-CF-01, rule: "AEENDTC >= AESTDTC", severity: error}
+
+# Accepted incoming date formats -> normalised to ISO 8601 (YYYY-MM-DD)
+date_formats: ["%Y-%m-%d", "%m/%d/%Y", "%d-%b-%Y", "%Y%m%d", "%Y-%m-%dT%H:%M:%S"]
