@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Inbound contract for the (synthetic) safety vendor. Structural checks only;
+     business rules (codelists, date logic) are enforced by the spec-driven validator. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:sv="urn:example:safety-vendor:v2"
+           targetNamespace="urn:example:safety-vendor:v2"
+           elementFormDefault="qualified">
+  <xs:element name="SafetyTransfer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="AdverseEvent" type="sv:AdverseEventType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="study" type="xs:string" use="required"/>
+      <xs:attribute name="transferId" type="xs:string" use="required"/>
+      <xs:attribute name="created" type="xs:dateTime" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="AdverseEventType">
+    <xs:sequence>
+      <xs:element name="Subject">
+        <xs:complexType><xs:attribute name="id" type="xs:string" use="required"/></xs:complexType>
+      </xs:element>
+      <xs:element name="Term" type="xs:string"/>
+      <xs:element name="Onset" type="xs:string"/>
+      <xs:element name="Resolution" type="xs:string" minOccurs="0"/>
+      <xs:element name="Severity" type="xs:string"/>
+      <xs:element name="Serious" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="seq" type="xs:positiveInteger" use="required"/>
+  </xs:complexType>
+</xs:schema>

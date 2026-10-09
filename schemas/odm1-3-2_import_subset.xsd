@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Outbound contract: the SUBSET of CDISC ODM 1.3.2 this tool emits.
+  Element names, nesting order and namespace follow ODM 1.3.2, but this is NOT the
+  official CDISC schema (download that from cdisc.org). It is deliberately strict so a
+  structural regression in odm.py fails CI instead of failing at the EDC.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:odm="http://www.cdisc.org/ns/odm/v1.3"
+           targetNamespace="http://www.cdisc.org/ns/odm/v1.3"
+           elementFormDefault="qualified">
+
+  <xs:simpleType name="oid"><xs:restriction base="xs:string"><xs:pattern value="[A-Za-z][A-Za-z0-9._\-]*"/></xs:restriction></xs:simpleType>
+  <xs:simpleType name="dataType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="text"/><xs:enumeration value="integer"/><xs:enumeration value="float"/>
+      <xs:enumeration value="date"/><xs:enumeration value="datetime"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="ODM">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="odm:Study"/>
+        <xs:element ref="odm:ClinicalData"/>
+      </xs:sequence>
+      <xs:attribute name="FileOID" type="odm:oid" use="required"/>
+      <xs:attribute name="FileType" use="required">
+        <xs:simpleType><xs:restriction base="xs:string">
+          <xs:enumeration value="Snapshot"/><xs:enumeration value="Transactional"/>
+        </xs:restriction></xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ODMVersion" type="xs:string" fixed="1.3.2"/>
+      <xs:attribute name="CreationDateTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="SourceSystem" type="xs:string"/>
+    </xs:complexType>
+    <!-- ItemDef OIDs are unique, and every ItemData/@ItemOID must reference one -->
+    <xs:key name="itemDefKey">
+      <xs:selector xpath="odm:Study/odm:MetaDataVersion/odm:ItemDef"/>
+      <xs:field xpath="@OID"/>
+    </xs:key>
+    <xs:keyref name="itemDataRef" refer="odm:itemDefKey">
+      <xs:selector xpath=".//odm:ItemData"/>
+      <xs:field xpath="@ItemOID"/>
+    </xs:keyref>
+  </xs:element>
+
+  <xs:element name="Study">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="GlobalVariables">
+          <xs:complexType><xs:sequence>
+            <xs:element name="StudyName" type="xs:string"/>
+            <xs:element name="StudyDescription" type="xs:string"/>
+            <xs:element name="ProtocolName" type="xs:string"/>
+          </xs:sequence></xs:complexType>
+        </xs:element>
+        <xs:element name="MetaDataVersion">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ItemDef" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="OID" type="odm:oid" use="required"/>
+                  <xs:attribute name="Name" type="xs:string" use="required"/>
+                  <xs:attribute name="DataType" type="odm:dataType" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="OID" type="odm:oid" use="required"/>
+            <xs:attribute name="Name" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="OID" type="odm:oid" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ClinicalData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="SubjectData" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SiteRef">
+                <xs:complexType><xs:attribute name="LocationOID" type="odm:oid" use="required"/></xs:complexType>
+              </xs:element>
+              <xs:element name="StudyEventData" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="FormData" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="ItemGroupData" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="ItemData" maxOccurs="unbounded">
+                                  <xs:complexType>
+                                    <xs:attribute name="ItemOID" type="odm:oid" use="required"/>
+                                    <xs:attribute name="Value" type="xs:string" use="required"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="ItemGroupOID" type="odm:oid" use="required"/>
+                              <xs:attribute name="ItemGroupRepeatKey" type="xs:positiveInteger" use="required"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="FormOID" type="odm:oid" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="StudyEventOID" type="odm:oid" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="SubjectKey" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="StudyOID" type="odm:oid" use="required"/>
+      <xs:attribute name="MetaDataVersionOID" type="odm:oid" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
