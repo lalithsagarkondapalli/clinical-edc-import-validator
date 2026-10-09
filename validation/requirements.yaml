@@ -1,0 +1,25 @@
+# User / functional requirements. Every requirement must be covered by >= 1 test
+# (enforced by tests/test_traceability.py). IDs are referenced by @pytest.mark.req(...).
+REQ-IN-01:  Read CSV, Excel, JSON and namespaced XML sources into a common record structure
+REQ-IN-02:  Record the SHA-256 checksum of every input file in the audit trail and run manifest
+REQ-IN-03:  Validate inbound vendor XML against its XSD and quarantine the whole file on failure
+REQ-IN-04:  Check the JSON transfer header (record count, vendor, study) and quarantine on mismatch
+REQ-MAP-01: Map source fields to ODM ItemOIDs exactly as defined in the transfer specification
+REQ-MAP-02: Normalise all accepted date formats to ISO 8601
+REQ-MAP-03: Decode source values through spec codelists
+REQ-MAP-04: Convert units to the target unit before range checks are applied
+REQ-VAL-01: Flag missing required values
+REQ-VAL-02: Flag values that do not match the item data type
+REQ-VAL-03: Flag values outside the specified range
+REQ-VAL-04: Enforce subject ID pattern, site consistency and registration in accepted DM
+REQ-VAL-05: Flag duplicate record keys (first occurrence kept)
+REQ-VAL-06: Apply cross-field rules defined in the spec
+REQ-VAL-07: Flag dates after the run date
+REQ-VAL-08: Reject any record with an error discrepancy; never partially load a record
+REQ-OUT-01: Produce ODM 1.3.2 XML that is valid against the outbound XSD, incl. ItemDef referential integrity
+REQ-OUT-02: Produce a discrepancy report with stable rule IDs, record numbers and values
+REQ-REC-01: Reconcile source = accepted + rejected and ODM XPath count = accepted, per dataset
+REQ-REC-02: Reconcile ItemData via an independent XSLT round trip and SQL staging checks
+REQ-AUD-01: Keep a hash-chained audit trail that detects edited, deleted or re-ordered entries
+REQ-AUD-02: Never overwrite the evidence of a previous run
+REQ-REG-01: Discrepancy output on the reference dataset matches the approved golden baseline
