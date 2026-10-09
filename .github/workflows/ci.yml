@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -r requirements.txt
+
+      - name: Regression + requirement tests
+        run: pytest -v --junitxml=out/test_evidence/junit.xml
+
+      - name: End-to-end run via PowerShell wrapper (pwsh is preinstalled on ubuntu runners)
+        shell: pwsh
+        run: ./scripts/Invoke-StudyImport.ps1 -Spec specs/CARD301_transfer_spec.yaml -OutDir out -RunDate 2026-04-15
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-evidence-py${{ matrix.python-version }}
+          path: out/
