@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC safety vendor transfer. Default namespace is the vendor's v2 schema. -->
+<sv:SafetyTransfer xmlns:sv="urn:example:safety-vendor:v2" study="CARD-301" transferId="SV-0042" created="2026-04-10T05:30:00Z">
+  <sv:AdverseEvent seq="1">
+    <sv:Subject id="S01-001"/>
+    <sv:Term>Headache</sv:Term>
+    <sv:Onset>2026-03-10</sv:Onset>
+    <sv:Resolution>2026-03-12</sv:Resolution>
+    <sv:Severity>Mild</sv:Severity>
+    <sv:Serious>false</sv:Serious>
+  </sv:AdverseEvent>
+  <sv:AdverseEvent seq="2">
+    <sv:Subject id="S01-002"/>
+    <sv:Term>Dizziness</sv:Term>
+    <sv:Onset>2026-03-15</sv:Onset>
+    <sv:Severity>MODERATE</sv:Severity>
+    <sv:Serious>N</sv:Serious>
+  </sv:AdverseEvent>
+  <sv:AdverseEvent seq="3">
+    <sv:Subject id="S02-001"/>
+    <sv:Term>Nausea</sv:Term>
+    <sv:Onset>2026-03-20</sv:Onset>
+    <sv:Resolution>2026-03-18</sv:Resolution>
+    <sv:Severity>MILD</sv:Severity>
+    <sv:Serious>N</sv:Serious>
+  </sv:AdverseEvent>
+  <sv:AdverseEvent seq="4">
+    <sv:Subject id="S01-004"/>
+    <sv:Term>Syncope</sv:Term>
+    <sv:Onset>2026-04-01</sv:Onset>
+    <sv:Resolution>2026-04-02</sv:Resolution>
+    <sv:Severity>SEVERE</sv:Severity>
+    <sv:Serious>Y</sv:Serious>
+  </sv:AdverseEvent>
+  <sv:AdverseEvent seq="5">
+    <sv:Subject id="S03-001"/>
+    <sv:Term>Rash</sv:Term>
+    <sv:Onset>2026-03-25</sv:Onset>
+    <sv:Severity>Grade 2</sv:Severity>
+    <sv:Serious>N</sv:Serious>
+  </sv:AdverseEvent>
+</sv:SafetyTransfer>
