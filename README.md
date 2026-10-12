@@ -20,6 +20,15 @@ Morsani College of Medicine) arrived already cleaned. I wanted to build the step
 the controlled transfer where a lab or site file becomes study data, and where the job is to
 prove that nothing was lost, changed silently, or loaded without passing the spec.
 
+## Decisions and trade-offs
+
+- **The spec drives everything.** Mapping and rules live in one YAML file; the code has no study-specific logic, so a new partner feed is a config change, not a code change.
+- **Reject, never silently fix.** A bad record is rejected in full with a stable rule ID and a reason; it is never partially loaded or auto-corrected. Whole files are quarantined when the file itself is wrong (schema, header, record count).
+- **Don't let code grade its own homework.** Counts are reconciled three independent ways (Python, XPath on the written file, XSLT + SQL), and a test deletes data on purpose to prove the checks catch it.
+- **Evidence is append-only.** Every run hashes its inputs and writes a hash-chained audit trail; runs never overwrite earlier evidence.
+
+The same discipline applies to any product that ingests customer or partner data: integrations fail in boring, specific ways, and the product should say exactly which record failed and why.
+
 ## How it works
 
 ```mermaid
@@ -66,7 +75,7 @@ trigger, in [docs/VALIDATION_PLAN.md](docs/VALIDATION_PLAN.md#4-seeded-errors-in
 Two VS rejections are a *cascade*: S02-003 and S03-002 failed DM, so their vitals have no
 registered subject and are rejected instead of being loaded as orphans.
 
-## What the job asks for → where it is in this repo
+## Requirements → where they live in this repo
 
 | Requirement | Where |
 |---|---|
